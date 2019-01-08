@@ -43,11 +43,16 @@ class App extends Component {
     public render() {
         return (
             <div className="App">
-                <Service useStatusBar={true} url={serverUrl} render={(status, connection, error) => (
-                    <div>
-                        Hello world
-                    </div>
-                )}/>
+                <Service
+                    url={serverUrl}
+                    config={{retryTimeout: 200}}
+                    useStatusBar={true}
+                    render={(status, connection, error) => (
+                        <div>
+                            Hello world
+                        </div>
+                    )}
+                />
                 <NScene width={window.innerWidth}
                         height={window.innerHeight - 50}
                         fov={40} near={1}

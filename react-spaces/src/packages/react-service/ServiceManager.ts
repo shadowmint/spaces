@@ -27,7 +27,7 @@ interface IServiceManagerConfig {
     onError: (e: any) => void;
 }
 
-interface IServiceManagerConfigPartial {
+export interface IServiceManagerConfigPartial {
     retryTimeout?: number;
     maxRetries?: number;
     onError?: (e: any) => void;
@@ -44,6 +44,12 @@ const defaultConfig: IServiceManagerConfig = {
 export class ServiceManager<TEvent> {
     /** The events API for the service manager */
     public events: ServiceManagerEvents<TEvent>;
+
+    /** If this service busy trying to do something? */
+    public get idle(): boolean {
+        console.log(this.state, ServiceManagerState.Disconnected);
+        return this.state === ServiceManagerState.Disconnected;
+    }
 
     private onMessage: null | MessageCb<TEvent> = null;
 
@@ -73,6 +79,7 @@ export class ServiceManager<TEvent> {
         if (this.state !== ServiceManagerState.Disconnected) {
             throw new ServiceManagerError(ServiceManagerErrorCode.AlreadyConnected);
         }
+        this.close();
         await this.tryConnectNow();
     }
 
@@ -82,6 +89,7 @@ export class ServiceManager<TEvent> {
     }
 
     public close() {
+        this.failuresSinceLastConnection = 0;
         this.transitionState(ServiceManagerState.Disconnected);
     }
 
@@ -138,6 +146,7 @@ export class ServiceManager<TEvent> {
         switch (state) {
             // If we are disconnected, stop.
             case ServiceManagerState.Disconnected:
+                this.state = ServiceManagerState.Disconnected;
                 if (this.connection) {
                     this.connection.close();
                     this.connection = null;
@@ -147,12 +156,12 @@ export class ServiceManager<TEvent> {
                     error,
                     status: ServiceManagerStatus.Disconnected,
                 });
-                this.state = ServiceManagerState.Disconnected;
                 break;
 
             // We are now busy trying to connect
             case ServiceManagerState.Connecting:
                 console.log("Connecting");
+                this.state = ServiceManagerState.Connecting;
                 this.onStatus({
                     context: this,
                     error,
@@ -161,12 +170,12 @@ export class ServiceManager<TEvent> {
                     maxAttempts: this.config.maxRetries,
                     status: ServiceManagerStatus.Connecting,
                 });
-                this.state = ServiceManagerState.Connecting;
                 break;
 
             // We are now waiting for the callback to try to connect
             case ServiceManagerState.WaitRetry:
                 console.log("WaitRetry");
+                this.state = ServiceManagerState.WaitRetry;
                 this.onStatus({
                     context: this,
                     error,
@@ -175,19 +184,18 @@ export class ServiceManager<TEvent> {
                     maxAttempts: this.config.maxRetries,
                     status: ServiceManagerStatus.Connecting,
                 });
-                this.state = ServiceManagerState.WaitRetry;
                 break;
 
             // We're connected now
             case ServiceManagerState.Connected:
                 console.log("Connected");
+                this.state = ServiceManagerState.Connected;
                 this.failuresSinceLastConnection = 0;
                 this.lastConnected = Date.now();
                 this.onStatus({
                     context: this,
                     status: ServiceManagerStatus.Connected,
                 });
-                this.state = ServiceManagerState.Connected;
                 break;
         }
     }

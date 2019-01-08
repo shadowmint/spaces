@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import styles from "./App.module.css";
-import {ServiceManager} from "../ServiceManager";
+import {IServiceManagerConfigPartial, ServiceManager} from "../ServiceManager";
 import {ServiceManagerStatus} from "../ServiceManagerEvents";
 import {ServiceStatusBar} from "./ServiceStatusBar";
 
@@ -17,6 +17,9 @@ interface IService {
 
     /** Render the application content with this */
     render: ServiceRenderProp;
+
+    /** Any addition service config */
+    config: IServiceManagerConfigPartial;
 }
 
 // tslint:disable-next-line:max-line-length
@@ -28,6 +31,7 @@ export interface IServiceState {
     failedAttempts?: number;
     maxAttempts?: number;
     lastConnected?: number | null;
+    idle: boolean;
     error: Error | null;
 }
 
@@ -41,24 +45,31 @@ export class Service extends Component<IService, IServiceState> {
             failedAttempts: 0,
             lastConnected: null,
             maxAttempts: 0,
+            idle: true,
             status: ServiceManagerStatus.Disconnected,
         };
     }
 
     public componentDidMount(): void {
-        this.state.connection.events.status.subscribe((status) => {
-            this.setState({
-                error: status.error || null,
-                failedAttempts: status.failedAttempts,
-                lastConnected: status.lastConnected,
-                maxAttempts: status.maxAttempts,
-                status: status.status,
+        this.setState({
+            connection: new ServiceManager<IServerEvent>(this.props.url, this.props.config),
+        }, () => {
+            this.state.connection.events.status.subscribe((status) => {
+                console.log("Event", status, this.state.connection.idle);
+                this.setState({
+                    error: status.error || null,
+                    failedAttempts: status.failedAttempts,
+                    idle: this.state.connection.idle,
+                    lastConnected: status.lastConnected,
+                    maxAttempts: status.maxAttempts,
+                    status: status.status,
+                });
             });
-        });
-        this.state.connection.connect().then(null, (error) => {
-            this.setState({error});
-        }).catch((error) => {
-            this.setState({error});
+            this.state.connection.connect().then(null, (error) => {
+                this.setState({error});
+            }).catch((error) => {
+                this.setState({error});
+            });
         });
     }
 
@@ -72,7 +83,9 @@ export class Service extends Component<IService, IServiceState> {
     public render() {
         return (
             <>
-                {this.props.useStatusBar ? <ServiceStatusBar {...this.state}/> : <React.Fragment/>}
+                {this.props.useStatusBar
+                    ? <ServiceStatusBar idle={this.state.idle} onConnect={this.onConnect} {...this.state}/>
+                    : <React.Fragment/>}
                 {this.props.render(
                     this.state.status,
                     this.state.connection,
@@ -83,5 +96,10 @@ export class Service extends Component<IService, IServiceState> {
                 )}
             </>
         );
+    }
+
+    /** Attempt to reconnect to the server */
+    private onConnect = () => {
+        return this.state.connection.connect();
     }
 }

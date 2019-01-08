@@ -5,9 +5,11 @@ import styles from "./ServiceStatusBar.module.scss";
 interface IServiceStatusBar {
     status: ServiceManagerStatus;
     error: Error | null;
+    idle: boolean;
     lastConnected?: number | null;
     failedAttempts?: number;
     maxAttempts?: number;
+    onConnect: () => Promise<void>;
 }
 
 const ServiceStatusBarError = (props: IServiceStatusBar) => {
@@ -24,6 +26,23 @@ const ServiceStatusBarError = (props: IServiceStatusBar) => {
     );
 };
 
+const ServiceStatusBarReconnectButton = (props: IServiceStatusBar) => (
+    <div className="reconnect">
+        <button onClick={props.onConnect}>Reconnect</button>
+    </div>
+);
+
+const ServiceStatusBarReconnect = (props: IServiceStatusBar) => {
+    const lastConnected = props.lastConnected ? new Date(props.lastConnected).toString() : "never";
+    return (
+        <div className="historyBar">
+            <div className="last">Last connected: {lastConnected}</div>
+            {props.idle ? <ServiceStatusBarReconnectButton {...props}/> : <React.Fragment/>}
+        </div>
+    );
+};
+
+
 export const ServiceStatusBar = (props: IServiceStatusBar) => {
     const isConnected = props.status === ServiceManagerStatus.Connected;
 
@@ -31,13 +50,12 @@ export const ServiceStatusBar = (props: IServiceStatusBar) => {
         ? `${props.status}, attempt ${props.failedAttempts}/${props.maxAttempts}...`
         : props.status;
 
-    const lastConnected = props.lastConnected ? new Date(props.lastConnected).toString() : "";
-
     return (
         <div className={styles.ServiceStatusBar} style={{display: isConnected ? "none" : "block"}}>
             <div className="status">{status}</div>
-            <div className="last">{lastConnected}</div>
+            Idle {props.idle ? "TRUE" : "FALSE"}
             <ServiceStatusBarError {...props}/>
+            <ServiceStatusBarReconnect {...props}/>
         </div>
     );
 };
