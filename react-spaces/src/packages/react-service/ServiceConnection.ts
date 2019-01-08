@@ -15,34 +15,54 @@ export class ServiceConnection<TEvent> {
     /** Attempt to open a websocket connection to the given url */
     public connect(url: string): Promise<void> {
         return new Promise((resolve, reject) => {
-            const socket = new WebSocket(url);
-            const onOpen = () => {
-                this.socket = socket;
-                this.messages = new Subject<TEvent>();
-                socket.removeEventListener(WebSocketEvent.Open, onOpen);
-                socket.removeEventListener(WebSocketEvent.Error, onError);
-                socket.addEventListener(WebSocketEvent.Message, this.onMessage);
-                socket.addEventListener(WebSocketEvent.Close, this.onClose);
-                socket.addEventListener(WebSocketEvent.Error, this.onError);
-                resolve();
-            };
-            const onError = (event: any) => {
-                reject(event);
-            };
-            socket.addEventListener(WebSocketEvent.Open, onOpen);
-            socket.addEventListener(WebSocketEvent.Error, onError);
+            try {
+                const socket = new WebSocket(url);
+                const onOpen = () => {
+                    this.socket = socket;
+                    this.messages = new Subject<TEvent>();
+                    socket.removeEventListener(WebSocketEvent.Open, onOpen);
+                    socket.removeEventListener(WebSocketEvent.Error, onError);
+                    socket.addEventListener(WebSocketEvent.Message, (e) => this.onMessage(e));
+                    socket.addEventListener(WebSocketEvent.Close, (e) => this.onClose(e));
+                    socket.addEventListener(WebSocketEvent.Error, (e) => this.onError(e));
+                    resolve();
+                };
+                const onError = (event: any) => {
+                    reject(new ServiceConnectionError(ServiceConnectionErrorCode.ConnectionFailed, event));
+                };
+                socket.addEventListener(WebSocketEvent.Open, onOpen);
+                socket.addEventListener(WebSocketEvent.Error, onError);
+            } catch (error) {
+                reject(new ServiceConnectionError(ServiceConnectionErrorCode.ConnectionFailed, event));
+            }
         });
     }
 
     /** Subscribe to messages from this connection */
-    public subscribe(): Observable<TEvent> {
+    public observer(): Observable<TEvent> {
         if (this.messages === null) {
             throw new ServiceConnectionError(ServiceConnectionErrorCode.NotConnected);
         }
         return this.messages;
     }
 
-    private onMessage = (event: any) => {
+    /** Close this socket connection */
+    public close() {
+        if (this.socket == null || this.messages == null) {
+            throw new ServiceConnectionError(ServiceConnectionErrorCode.NotConnected);
+        }
+
+        // 1000 = normal explicit closure event.
+        // see: https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#Status_codes
+        this.socket.close(1000);
+        this.socket = null;
+
+        // Close message stream
+        this.messages.complete();
+        this.messages = null;
+    }
+
+    private onMessage(event: any) {
         if (this.messages === null) {
             throw new ServiceConnectionError(ServiceConnectionErrorCode.NotConnected);
         }
@@ -55,7 +75,7 @@ export class ServiceConnection<TEvent> {
         }
     }
 
-    private onClose = (event: any) => {
+    private onClose(event: any) {
         if (this.messages === null) {
             throw new ServiceConnectionError(ServiceConnectionErrorCode.NotConnected);
         }
@@ -63,10 +83,11 @@ export class ServiceConnection<TEvent> {
         this.messages = null;
     }
 
-    private onError = (event: any) => {
+    private onError(event: any) {
         if (this.messages === null) {
             throw new ServiceConnectionError(ServiceConnectionErrorCode.NotConnected);
         }
+        console.log(event);
         this.messages.error(event as Error);
         this.messages = null;
     }

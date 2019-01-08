@@ -15,11 +15,5 @@ import "./serviceWorker";
     }
 
     // Real mode
-    try {
-        const serviceConnection = await new SocketService().connect();
-        ReactDOM.render(<App service={serviceConnection}/>, document.getElementById("root"));
-
-    } catch (error) {
-        ReactDOM.render(<AppError>server offline</AppError>, document.getElementById("root"));
-    }
+    ReactDOM.render(<App/>, document.getElementById("root"));
 })();

@@ -1,6 +1,7 @@
 import React, {Component} from "react";
-import {NSurface} from "../../react-surfaces/components/NSurface";
+import {Service} from "../../react-service/components/Service";
 import {NScene} from "../../react-surfaces/components/NScene";
+import {NSurface} from "../../react-surfaces/components/NSurface";
 import {Transform} from "../../react-surfaces/model/Transform";
 import {SocketService} from "../../spaces-api/network/socket";
 
@@ -36,14 +37,17 @@ const objects = [
     },
 ];
 
-interface IApp {
-    service: SocketService,
-}
+const serverUrl = "ws://127.0.0.1:3012";
 
-class App extends Component<IApp> {
+class App extends Component {
     public render() {
         return (
             <div className="App">
+                <Service useStatusBar={true} url={serverUrl} render={(status, connection, error) => (
+                    <div>
+                        Hello world
+                    </div>
+                )}/>
                 <NScene width={window.innerWidth}
                         height={window.innerHeight - 50}
                         fov={40} near={1}
