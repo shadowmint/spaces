@@ -1,5 +1,4 @@
 import React, {Component} from "react";
-import styles from "./App.module.css";
 import {IServiceManagerConfigPartial, ServiceManager} from "../ServiceManager";
 import {ServiceManagerStatus} from "../ServiceManagerEvents";
 import {ServiceStatusBar} from "./ServiceStatusBar";
@@ -43,9 +42,9 @@ export class Service extends Component<IService, IServiceState> {
             connection: manager,
             error: null,
             failedAttempts: 0,
+            idle: true,
             lastConnected: null,
             maxAttempts: 0,
-            idle: true,
             status: ServiceManagerStatus.Disconnected,
         };
     }

@@ -14,48 +14,46 @@ interface IServiceStatusBar {
 
 const ServiceStatusBarError = (props: IServiceStatusBar) => {
     if (!props.error) {
-        return <React.Fragment/>;
+        return (
+            <div className={styles.errorBar}>Unknown network status</div>
+        );
+    }
+    const errMessage = (props.error || {message: "No error message"}).message;
+    if (props.status === ServiceManagerStatus.Connecting) {
+        return (
+            <div className={styles.errorBar}>
+                {errMessage}, {props.failedAttempts}/{props.maxAttempts} connection failures.
+            </div>
+        );
     }
     return (
-        <div className="errorBar">
-            <span>Error: </span>
-            <span>
-                {(props.error || {message: "No error message"}).message}
-            </span>
-        </div>
+        <div className={styles.errorBar}>{errMessage}</div>
     );
 };
 
 const ServiceStatusBarReconnectButton = (props: IServiceStatusBar) => (
-    <div className="reconnect">
-        <button onClick={props.onConnect}>Reconnect</button>
+    <div className={styles.reconnect}>
+        <button className={styles.reconnect} onClick={props.onConnect}>Reconnect</button>
     </div>
 );
 
 const ServiceStatusBarReconnect = (props: IServiceStatusBar) => {
-    const lastConnected = props.lastConnected ? new Date(props.lastConnected).toString() : "never";
+    const lastConnected = props.lastConnected ? new Date(props.lastConnected).toLocaleTimeString() : "never";
     return (
-        <div className="historyBar">
-            <div className="last">Last connected: {lastConnected}</div>
+        <div className={styles.historyBar}>
+            <span>Last connected: {lastConnected}</span>
             {props.idle ? <ServiceStatusBarReconnectButton {...props}/> : <React.Fragment/>}
         </div>
     );
 };
 
-
 export const ServiceStatusBar = (props: IServiceStatusBar) => {
     const isConnected = props.status === ServiceManagerStatus.Connected;
-
-    const status = props.status === ServiceManagerStatus.Connecting
-        ? `${props.status}, attempt ${props.failedAttempts}/${props.maxAttempts}...`
-        : props.status;
-
     return (
-        <div className={styles.ServiceStatusBar} style={{display: isConnected ? "none" : "block"}}>
-            <div className="status">{status}</div>
-            Idle {props.idle ? "TRUE" : "FALSE"}
-            <ServiceStatusBarError {...props}/>
+        <div className={styles.component} style={{display: isConnected ? "none" : "flex"}}>
             <ServiceStatusBarReconnect {...props}/>
+            <ServiceStatusBarError {...props}/>
+            <div className={styles.status}>Network status: {props.status}</div>
         </div>
     );
 };

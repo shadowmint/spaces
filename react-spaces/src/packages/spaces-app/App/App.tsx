@@ -1,9 +1,8 @@
 import React, {Component} from "react";
-import {Service} from "../../react-service/components/Service";
 import {NScene} from "../../react-surfaces/components/NScene";
 import {NSurface} from "../../react-surfaces/components/NSurface";
 import {Transform} from "../../react-surfaces/model/Transform";
-import {SocketService} from "../../spaces-api/network/socket";
+import {Service} from "../../react-service/components/Service";
 
 const Demo = (props: any) => {
     return (

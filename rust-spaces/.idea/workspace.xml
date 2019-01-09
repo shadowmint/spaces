@@ -157,7 +157,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -175,6 +174,7 @@
         </subPane>
       </pane>
       <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -280,6 +280,7 @@
       <workItem from="1546431903075" duration="2462000" />
       <workItem from="1546601478829" duration="934000" />
       <workItem from="1546943960212" duration="278000" />
+      <workItem from="1546950089242" duration="229000" />
     </task>
     <servers />
   </component>
@@ -295,13 +296,12 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14713000" />
+    <option name="totallyTimeSpent" value="14942000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="3106" y="185" width="1249" height="885" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="26" width="1625" height="1328" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.31814417" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24636766" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Designer" order="2" />
       <window_info id="Favorites" order="3" side_tool="true" />
@@ -320,7 +320,7 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Cargo" order="3" visible="true" weight="0.3827672" />
+      <window_info active="true" anchor="right" id="Cargo" order="3" visible="true" weight="0.09286165" />
       <window_info anchor="right" id="Maven" order="4" />
       <window_info anchor="right" id="Database" order="5" />
       <window_info anchor="right" id="Palette&#9;" order="6" />

@@ -1,10 +1,84 @@
-.ServiceStatusBar {
+$color-text: #333333;
+$color-panel: #fafafa;
+$color-panel-medium: #f3f3f3;
+$color-panel-dark: #cacaca;
+$color-action: #7680ca;
+
+.component {
   position: fixed;
-  //display: none;
+  display: none;
   top: 0;
   left: 0;
   margin: 0;
   border: 0;
-  background: #efefef;
+  background: $color-panel;
   z-index: 10;
+  width: 100%;
+  padding: 0.5rem 0 0;
+  box-sizing: border-box;
+  color: $color-text;
+  border-bottom: thin solid $color-panel-dark;
+  font-size: 0.8rem;
+
+  > div {
+    padding: 0 0.6rem;
+  }
+
+  /** Flex box */
+  justify-content: space-between;
+  flex-direction: row;
+  flex-flow: row wrap;
+}
+
+/** History data */
+.historyBar {
+  width: 100%;
+  order: -1;
+  line-height: 1.5rem;
+  height: 1.5rem;
+
+  > span {
+    line-height: 1.5rem;
+    height: 1.5rem;
+    display: inline-block;
+  }
+
+  /** Flex box */
+  justify-content: space-between;
+  flex-direction: row;
+  flex-flow: row;
+  display: inline-flex;
+}
+
+/** Status */
+.status {
+  width: 100%;
+  box-sizing: border-box;
+  background: $color-panel-medium;
+  margin-top: 0.2rem;
+  line-height: 1.8rem;
+}
+
+/** Errors */
+.errorBar {
+  order: 0;
+  line-height: 1.5rem;
+  display: inline-block;
+  font-size: 0.7rem;
+}
+
+/** The reconnect button */
+.reconnect {
+  display: inline-block;
+  button {
+    border: 0;
+    font-size: 0.8rem;
+    background: none;
+    color: $color-action;
+    cursor: pointer;
+    &:hover {
+      background: $color-panel-medium;
+      text-decoration: underline;
+    }
+  }
 }

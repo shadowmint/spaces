@@ -63,7 +63,7 @@ export class ServiceManager<TEvent> {
 
     private reconnectTimerHook: any = null;
 
-    private config: IServiceManagerConfig;
+    private readonly config: IServiceManagerConfig;
 
     private lastConnected: number | null = null;
 
@@ -154,6 +154,7 @@ export class ServiceManager<TEvent> {
                 this.onStatus({
                     context: this,
                     error,
+                    lastConnected: this.lastConnected,
                     status: ServiceManagerStatus.Disconnected,
                 });
                 break;
