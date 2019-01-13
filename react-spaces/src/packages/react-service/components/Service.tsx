@@ -54,7 +54,6 @@ export class Service extends Component<IService, IServiceState> {
             connection: new ServiceManager<IServerEvent>(this.props.url, this.props.config),
         }, () => {
             this.state.connection.events.status.subscribe((status) => {
-                console.log("Event", status, this.state.connection.idle);
                 this.setState({
                     error: status.error || null,
                     failedAttempts: status.failedAttempts,

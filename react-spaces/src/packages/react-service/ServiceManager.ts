@@ -161,7 +161,6 @@ export class ServiceManager<TEvent> {
 
             // We are now busy trying to connect
             case ServiceManagerState.Connecting:
-                console.log("Connecting");
                 this.state = ServiceManagerState.Connecting;
                 this.onStatus({
                     context: this,
@@ -175,7 +174,6 @@ export class ServiceManager<TEvent> {
 
             // We are now waiting for the callback to try to connect
             case ServiceManagerState.WaitRetry:
-                console.log("WaitRetry");
                 this.state = ServiceManagerState.WaitRetry;
                 this.onStatus({
                     context: this,
@@ -189,7 +187,6 @@ export class ServiceManager<TEvent> {
 
             // We're connected now
             case ServiceManagerState.Connected:
-                console.log("Connected");
                 this.state = ServiceManagerState.Connected;
                 this.failuresSinceLastConnection = 0;
                 this.lastConnected = Date.now();

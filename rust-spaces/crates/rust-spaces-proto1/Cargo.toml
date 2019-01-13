@@ -1,7 +1,0 @@
-[package]
-name = "rust-spaces-proto1"
-version = "0.1.0"
-authors = ["Douglas Linder <linderd@iinet.net.au>"]
-edition = "2018"
-
-[dependencies]
